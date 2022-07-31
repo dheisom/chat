@@ -2,19 +2,23 @@ package errors
 
 type E map[string]string
 
+func NewE(d string) E {
+	return E{"error": d}
+}
+
 var (
 	// Users
-	TokenNotExists    = E{"error": "this token does not exists"}
-	UserNameEmpty     = E{"error": "the user name is empty"}
-	UserAlreadyExists = E{"error": "this user already exists"}
-	UserNotExists     = E{"error": "this user not exists"}
-	InvalidID         = E{"error": "this ID is invalid"}
+	TokenNotExists    = NewE("this token does not exists")
+	UserNameEmpty     = NewE("the user name is empty")
+	UserAlreadyExists = NewE("this user already exists")
+	UserNotExists     = NewE("this user not exists")
+	InvalidID         = NewE("this ID is invalid")
 
 	// Messages
-	EmptyMessage  = E{"error": "the text of the message is empty"}
-	NoDestinatary = E{"error": "your message is without destinatary"}
-	What          = E{"error": "what are you trying to do?"}
+	EmptyMessage  = NewE("the text of the message is empty")
+	NoDestinatary = NewE("your message is without destinatary")
+	What          = NewE("what are you trying to do?")
 
 	// Data
-	FailedToParseJSON = E{"error": "failed to parse JSON data"}
+	FailedToParseJSON = NewE("failed to parse JSON data")
 )
