@@ -4,11 +4,14 @@ import (
 	"api/database"
 	"api/errors"
 	"api/types"
+	"fmt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func Start(p string) {
@@ -20,6 +23,7 @@ func Start(p string) {
 		{
 			methods.POST("/sendMessage", SendMessage)
 			methods.GET("/getMe", GetMe)
+			methods.GET("/getUser", GetUser)
 		}
 	}
 	err := server.Run(":" + p)
@@ -28,7 +32,7 @@ func Start(p string) {
 	}
 }
 
-func badRequest(c *gin.Context, e gin.H) {
+func badRequest(c *gin.Context, e errors.E) {
 	c.JSON(http.StatusBadRequest, e)
 }
 
@@ -49,6 +53,15 @@ func genToken() string {
 	return string(inRune)
 }
 
+func isTokenOK(c *gin.Context) bool {
+	token := c.Param("token")
+	if !database.TokenExists(token) {
+		badRequest(c, errors.TokenNotExists)
+		return false
+	}
+	return true
+}
+
 func CreateUser(c *gin.Context) {
 	user := &types.User{}
 	err := c.BindJSON(user)
@@ -62,7 +75,7 @@ func CreateUser(c *gin.Context) {
 	} else if user.Username == "" {
 		uname := ""
 		for i := 0; i < 8; i++ {
-			uname = uname + string(rand.Intn(9))
+			uname = uname + fmt.Sprintf("%c", rand.Intn(9))
 		}
 		user.Username = uname
 	}
@@ -84,25 +97,54 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetMe(c *gin.Context) {
-	token := c.Param("token")
-	if !database.TokenExists(token) {
-		badRequest(c, errors.TokenNotExists)
+	if !isTokenOK(c) {
 		return
 	}
+	token := c.Param("token")
 	me := database.GetUserByToken(token)
 	c.JSON(http.StatusOK, me)
 }
 
-func SendMessage(c *gin.Context) {
-	token := c.Param("token")
-	if !database.TokenExists(token) {
-		badRequest(c, errors.TokenNotExists)
+func GetUser(c *gin.Context) {
+	if !isTokenOK(c) {
 		return
 	}
+	user := &types.User{}
+	if c.Query("id") != "" {
+		id, err := strconv.Atoi(c.Query("id"))
+		if err != nil {
+			badRequest(c, errors.InvalidID)
+			return
+		}
+		user.ID = uint(id)
+	} else if c.Query("username") != "" {
+		user.Username = c.Query("username")
+	} else {
+		badRequest(c, errors.What)
+		return
+	}
+	err := database.GetUser(user)
+	if err == gorm.ErrRecordNotFound {
+		badRequest(c, errors.UserNotExists)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "unknow error: " + err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func SendMessage(c *gin.Context) {
+	if !isTokenOK(c) {
+		return
+	}
+	token := c.Param("token")
 	message := &types.Message{}
 	err := c.BindJSON(message)
 	if err != nil {
-		badRequest(c, gin.H{
+		badRequest(c, errors.E{
 			"error": "failed to parse JSON: " + err.Error(),
 		})
 		return

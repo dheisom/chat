@@ -1,3 +1,8 @@
+# create user
+
+`/api/createUser`
+
+
 # base URL
 
 `/api/{token}/{method}`

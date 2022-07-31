@@ -53,9 +53,7 @@ func GetUserByToken(t string) *types.User {
 	return user
 }
 
-func GetUserByID(id uint) *types.User {
-	user := &types.User{}
-	user.ID = id
-	db.First(user)
-	return user
+func GetUser(u *types.User) error {
+	err := db.First(u, u).Error
+	return err
 }
