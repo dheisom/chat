@@ -23,13 +23,25 @@ func RunMigrations() {
 	db.AutoMigrate(&types.Message{})
 }
 
-func CreateUser(u *types.User, t string) error {
-	err := db.Create(u).Error
-	if err != nil {
-		return err
+func CreateUser(u *types.NewUser, t string) (*types.CreatedUser, error) {
+	user := &types.User{
+		Name:     u.Name,
+		Username: u.Username,
+		Bio:      u.Bio,
 	}
-	err = db.Create(&types.Token{Token: t, UserID: u.ID}).Error
-	return err
+	err := db.Create(user).Error
+	if err != nil {
+		return &types.CreatedUser{}, err
+	}
+	err = db.Create(&types.Token{Token: t, UserID: user.ID}).Error
+	created_user := &types.CreatedUser{
+		ID:       user.ID,
+		Name:     user.Name,
+		Username: user.Username,
+		Bio:      user.Bio,
+		Token:    t,
+	}
+	return created_user, err
 }
 
 func SaveMessage(m *types.Message) (uint, error) {

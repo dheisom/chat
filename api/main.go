@@ -17,6 +17,6 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	log.Printf("Starting server on port %s...\n", port)
+	log.Printf("Starting server at port %s...\n", port)
 	server.Start(port)
 }

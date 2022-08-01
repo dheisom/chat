@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -32,44 +31,13 @@ func Start(p string) {
 	}
 }
 
-func badRequest(c *gin.Context, e errors.E) {
-	c.JSON(http.StatusBadRequest, e)
-}
-
-func genToken() string {
-	var token strings.Builder
-	lowerCharSet := "abcdedfghijklmnopqrst"
-	upperCharSet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	numberSet := "0123456789"
-	allCharSet := lowerCharSet + upperCharSet + numberSet
-	for i := 0; i < 16; i++ {
-		n := rand.Intn(len(allCharSet))
-		token.WriteString(string(allCharSet[n]))
-	}
-	inRune := []rune(token.String())
-	rand.Shuffle(len(inRune), func(i, j int) {
-		inRune[i], inRune[j] = inRune[j], inRune[i]
-	})
-	return string(inRune)
-}
-
-func isTokenOK(c *gin.Context) bool {
-	token := c.Param("token")
-	if !database.TokenExists(token) {
-		badRequest(c, errors.TokenNotExists)
-		return false
-	}
-	return true
-}
-
 func CreateUser(c *gin.Context) {
-	user := &types.User{}
+	user := &types.NewUser{}
 	err := c.BindJSON(user)
 	if err != nil {
 		badRequest(c, errors.FailedToParseJSON)
 		return
-	}
-	if user.Name == "" {
+	} else if user.Name == "" {
 		badRequest(c, errors.UserNameEmpty)
 		return
 	} else if user.Username == "" {
@@ -83,17 +51,12 @@ func CreateUser(c *gin.Context) {
 	for database.TokenExists(token) {
 		token = genToken()
 	}
-	err = database.CreateUser(user, token)
+	created_user, err := database.CreateUser(user, token)
 	if err != nil {
 		c.JSON(http.StatusConflict, errors.UserAlreadyExists)
 		return
 	}
-	c.JSON(http.StatusOK, types.CreatedUser{
-		ID:       user.ID,
-		Name:     user.Name,
-		Username: user.Username,
-		Token:    token,
-	})
+	c.JSON(http.StatusOK, created_user)
 }
 
 func GetMe(c *gin.Context) {
