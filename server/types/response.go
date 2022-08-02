@@ -23,3 +23,8 @@ type MessageResponse struct {
 	Sended   time.Time `json:"sended"`
 	Viewed   bool      `json:"viewed"`
 }
+
+type Chat struct {
+	ID    uint   `json:"id"`
+	Title string `json:"title"`
+}

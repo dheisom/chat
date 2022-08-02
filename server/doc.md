@@ -52,3 +52,7 @@ Get informations about another user
 |  Query  |  Type                    |  Description                             |
 | :------ | :----------------------- | :--------------------------------------- |
 | `user`  | Unsigned integer or Text | User ID or username of the other client  |
+
+## **GET**: `getChats`
+
+Get chats that you have sended or received messages

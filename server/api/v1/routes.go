@@ -17,6 +17,7 @@ func Registry(g *gin.RouterGroup) {
 		methods.GET("/getMe", GetMe)
 		methods.GET("/getUser", GetUser)
 		methods.GET("/getMessages", GetMessages)
+		methods.GET("/getChats", GetChats)
 	}
 }
 

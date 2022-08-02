@@ -103,7 +103,16 @@ func GetMessages(c *gin.Context) {
 		}
 		seek = uint(s)
 	}
-	messages := database.GetMessages(uid, seek)
+	var limit int = 50
+	if c.Query("limit") != "" {
+		l, err := strconv.Atoi(c.Query("limit"))
+		if err != nil || l <= 0 {
+			util.BadRequest(c, errors.InvalidLimit)
+			return
+		}
+		limit = l
+	}
+	messages := database.GetMessages(uid, seek, limit)
 	var response []types.MessageResponse
 	for i := range messages {
 		if messages[i].Text == "" {
@@ -118,4 +127,10 @@ func GetMessages(c *gin.Context) {
 		})
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func GetChats(c *gin.Context) {
+	uid := database.GetUserByToken(c.Param("token")).ID
+	chats := database.GetChats(uid)
+	c.JSON(http.StatusOK, chats)
 }

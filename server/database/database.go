@@ -71,8 +71,27 @@ func GetUser(u *types.User) (*types.User, error) {
 	return user, err
 }
 
-func GetMessages(u uint, s uint) []types.Message {
+func GetMessages(u uint, s uint, l int) []types.Message {
 	var messages []types.Message
-	db.Where("messages.id >= ?", s).Find(&messages, &types.Message{FromUser: u})
+	db.Where("messages.id >= ?", s).Limit(l).Find(
+		&messages,
+		&types.Message{FromUser: u},
+	)
 	return messages
+}
+
+func GetChats(u uint) []types.Chat {
+	var users []types.User
+	db.Joins(
+		"JOIN messages ON (messages.from_user=users.id OR messages.to_user=users.id) AND users.id=?",
+		u,
+	).Distinct().Find(&users)
+	var chats []types.Chat
+	for i := range users {
+		chats = append(chats, types.Chat{
+			ID:    users[i].ID,
+			Title: users[i].Name,
+		})
+	}
+	return chats
 }

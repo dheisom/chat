@@ -23,4 +23,5 @@ var (
 	// Data
 	FailedToParseJSON = NewE("failed to parse JSON data")
 	InvalidSeek       = NewE("invalid seek position")
+	InvalidLimit      = NewE("invalid limit")
 )
