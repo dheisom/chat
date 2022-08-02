@@ -1,11 +1,12 @@
 package main
 
 import (
-	"api/database"
-	"api/server"
 	"log"
 	"os"
+	"server/api"
+	"server/database"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/sqlite"
 )
@@ -17,6 +18,8 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	server := gin.Default()
+	api.RegistryAll(server.Group("/api"))
 	log.Printf("Starting server at port %s...\n", port)
-	server.Start(port)
+	server.Run(":" + port)
 }

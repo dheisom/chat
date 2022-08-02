@@ -15,10 +15,12 @@ var (
 	InvalidID         = NewE("this ID is invalid")
 
 	// Messages
-	EmptyMessage  = NewE("the text of the message is empty")
-	NoDestinatary = NewE("your message is without destinatary")
-	What          = NewE("what are you trying to do?")
+	EmptyMessage      = NewE("the text of the message is empty")
+	NoDestinatary     = NewE("your message is without destinatary")
+	What              = NewE("what are you trying to do?")
+	ReceiverNotExists = NewE("the receiver user does not exists")
 
 	// Data
 	FailedToParseJSON = NewE("failed to parse JSON data")
+	InvalidSeek       = NewE("invalid seek position")
 )

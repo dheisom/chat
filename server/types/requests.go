@@ -10,3 +10,8 @@ type NewUser struct {
 	Username string `json:"username"`
 	Bio      string `json:"bio"`
 }
+
+type NewMessage struct {
+	Text   string `json:"text"`
+	ToUser string `json:"to_user"`
+}

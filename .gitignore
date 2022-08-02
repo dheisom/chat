@@ -1,2 +1,2 @@
-api/api
-api/database.db
+server/server
+server/database.db

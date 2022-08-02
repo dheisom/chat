@@ -1,20 +1,19 @@
-package server
+package util
 
 import (
-	"api/database"
-	"api/errors"
 	"math/rand"
 	"net/http"
+	"server/errors"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func badRequest(c *gin.Context, e errors.E) {
+func BadRequest(c *gin.Context, e errors.E) {
 	c.JSON(http.StatusBadRequest, e)
 }
 
-func genToken() string {
+func GenToken() string {
 	var token strings.Builder
 	lowerCharSet := "abcdedfghijklmnopqrst"
 	upperCharSet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -29,13 +28,4 @@ func genToken() string {
 		inRune[i], inRune[j] = inRune[j], inRune[i]
 	})
 	return string(inRune)
-}
-
-func isTokenOK(c *gin.Context) bool {
-	token := c.Param("token")
-	if !database.TokenExists(token) {
-		badRequest(c, errors.TokenNotExists)
-		return false
-	}
-	return true
 }

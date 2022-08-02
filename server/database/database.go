@@ -1,7 +1,7 @@
 package database
 
 import (
-	"api/types"
+	"server/types"
 
 	"gorm.io/gorm"
 )
@@ -65,7 +65,14 @@ func GetUserByToken(t string) *types.User {
 	return user
 }
 
-func GetUser(u *types.User) error {
-	err := db.First(u, u).Error
-	return err
+func GetUser(u *types.User) (*types.User, error) {
+	user := &types.User{}
+	err := db.First(user, u).Error
+	return user, err
+}
+
+func GetMessages(u uint, s uint) []types.Message {
+	var messages []types.Message
+	db.Where("messages.id >= ?", s).Find(&messages, &types.Message{FromUser: u})
+	return messages
 }
