@@ -1,2 +1,4 @@
 server/server
 server/database.db
+web/build
+web/node_modules
