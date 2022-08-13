@@ -1,0 +1,7 @@
+:root {
+  --primary: #8e24aa;
+}
+
+.conteiner-size {
+  max-width: 30rem;
+}
